@@ -1,0 +1,76 @@
+:root {
+  --color-page: #faf9f5;
+  --color-brand-panel: #ebeee6;
+  --color-surface: #ffffff;
+  --color-subtle: #f2f4ee;
+  --color-primary: #285344;
+  --color-primary-hover: #1f4639;
+  --color-text-primary: #243b33;
+  --color-text-secondary: #59665d;
+  --color-text-muted: #7b8279;
+  --color-accent: #9b8966;
+  --color-border: #dce0d6;
+  --color-inverse: #ffffff;
+  --color-error: #a83f38;
+  --color-focus-ring: rgb(40 83 68 / 14%);
+  --shadow-focus: 0 0 0 3px var(--color-focus-ring);
+
+  --font-serif: "Noto Serif SC", "Songti SC", STSong, serif;
+  --font-sans: "Noto Sans SC", "PingFang SC", "Hiragino Sans GB",
+    "Microsoft YaHei", sans-serif;
+  --font-latin: Inter, "Helvetica Neue", Arial, sans-serif;
+
+  --text-10: 10px;
+  --text-11: 11px;
+  --text-12: 12px;
+  --text-13: 13px;
+  --text-14: 14px;
+  --text-15: 15px;
+  --text-21: 21px;
+  --text-32: 32px;
+  --text-34: 34px;
+  --text-43: 43px;
+
+  --line-tight: 1.2;
+  --line-copy: 1.8;
+  --line-headline: 1.5;
+
+  --space-1: 3px;
+  --space-2: 4px;
+  --space-3: 5px;
+  --space-4: 7px;
+  --space-5: 8px;
+  --space-6: 9px;
+  --space-7: 10px;
+  --space-8: 12px;
+  --space-9: 14px;
+  --space-10: 15px;
+  --space-11: 16px;
+  --space-12: 18px;
+  --space-13: 20px;
+  --space-14: 22px;
+  --space-15: 24px;
+  --space-16: 28px;
+  --space-17: 30px;
+  --space-18: 32px;
+  --space-19: 38px;
+  --space-20: 44px;
+  --space-21: 52px;
+  --space-22: 56px;
+  --space-23: 64px;
+  --space-24: 97px;
+
+  --radius-xs: 3px;
+  --radius-sm: 4px;
+  --radius-md: 6px;
+  --radius-pill: 999px;
+
+  --layout-max-width: 1440px;
+  --layout-min-height: 1000px;
+  --brand-panel-width: clamp(500px, 41.6667%, 600px);
+  --form-login-width: 424px;
+  --form-register-width: 480px;
+  --control-height: 50px;
+  --primary-action-height: 52px;
+  --photo-height: 350px;
+}

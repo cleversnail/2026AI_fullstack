@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+  <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+</head>
+<body class="bg-gray-100 flex justify-center items-center min-h-screen">
+  <div class="box bg-white p-10 rounded-xl shadow-xl w-96 space-y-5">
+    <h1 class="text-2xl font-bold text-center text-gray-800">后台管理系统</h1>
+    <input type="text" placeholder="请输入账号"
+      class="account w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+    <input type="password" placeholder="请输入密码"
+      class="password w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+    <button class="w-full py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition">登录</button>
+  </div>
+
+  <script>
+    const btn = document.querySelector('button');
+    btn.addEventListener('click', async () => {
+      // console.log('登录');
+      // 获取用户输入的账号和密码
+      const account = document.querySelector('.account').value;
+      const password = document.querySelector('.password').value;
+      // console.log(account, password);
+      // 将账号密码传输给后端
+      const res = await fetch(`http://localhost:3000/login?account=${account}&password=${password}`);
+      const data = await res.json();
+      console.log(data);
+      if (data.length > 0) {
+        alert('登录成功');
+      } else {
+        alert('登录失败');
+      }
+    });
+
+  </script>
+</body>
+</html>

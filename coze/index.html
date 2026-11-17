@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>月亮睡前故事</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    min-height: 100vh;
+    font-family: "PingFang SC", "Microsoft YaHei", "Helvetica Neue", sans-serif;
+    background: linear-gradient(160deg, #0f0c29 0%, #302b63 50%, #24243e 100%);
+    color: #f4f0ff;
+    overflow-x: hidden;
+    position: relative;
+  }
+
+  /* 星空背景 */
+  .stars, .stars2, .stars3 {
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    pointer-events: none; z-index: 0;
+  }
+  .stars { background-image: radial-gradient(1px 1px at 20px 30px, #fff, transparent),
+                              radial-gradient(1px 1px at 40px 70px, #fff, transparent),
+                              radial-gradient(1px 1px at 90px 40px, #fff, transparent),
+                              radial-gradient(1.5px 1.5px at 130px 80px, #fff, transparent),
+                              radial-gradient(1px 1px at 160px 120px, #fff, transparent);
+           background-repeat: repeat; background-size: 200px 200px; animation: twinkle 4s infinite; }
+  .stars2 { background-image: radial-gradient(1px 1px at 50px 160px, #ffd6e0, transparent),
+                              radial-gradient(1px 1px at 120px 200px, #c9b6ff, transparent),
+                              radial-gradient(1.5px 1.5px at 180px 100px, #fff, transparent);
+           background-repeat: repeat; background-size: 250px 250px; animation: twinkle 6s infinite 1s; }
+  .stars3 { background-image: radial-gradient(1px 1px at 30px 200px, #fff, transparent),
+                              radial-gradient(1px 1px at 200px 50px, #ffe9a8, transparent);
+           background-repeat: repeat; background-size: 300px 300px; animation: twinkle 8s infinite 2s; }
+  @keyframes twinkle { 0%,100% { opacity: .3; } 50% { opacity: 1; } }
+
+  /* 月亮 */
+  .moon {
+    position: fixed; top: 60px; right: 80px; width: 90px; height: 90px;
+    background: radial-gradient(circle at 35% 35%, #fffbe6, #ffe9a8 60%, #ffd86b);
+    border-radius: 50%; box-shadow: 0 0 60px rgba(255, 233, 168, .5), 0 0 120px rgba(255, 216, 107, .3);
+    z-index: 1;
+  }
+
+  .container {
+    position: relative; z-index: 2;
+    max-width: 720px; margin: 0 auto; padding: 60px 24px 80px;
+  }
+
+  h1 {
+    text-align: center; font-size: 32px; font-weight: 600;
+    background: linear-gradient(90deg, #ffd86b, #ffb6c1, #c9b6ff);
+    -webkit-background-clip: text; background-clip: text; color: transparent;
+    margin-bottom: 8px; letter-spacing: 2px;
+  }
+  .subtitle { text-align: center; color: #b8b0d8; font-size: 15px; margin-bottom: 40px; }
+
+  .input-card {
+    background: rgba(255, 255, 255, .06);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, .12);
+    border-radius: 20px; padding: 24px; margin-bottom: 28px;
+  }
+  .input-label { font-size: 14px; color: #d4cdf0; margin-bottom: 10px; display: block; }
+  .input-row { display: flex; gap: 12px; }
+  input[type="text"] {
+    flex: 1; padding: 14px 18px; border-radius: 14px;
+    border: 1px solid rgba(255, 255, 255, .18);
+    background: rgba(0, 0, 0, .25); color: #fff;
+    font-size: 16px; outline: none; transition: border-color .2s;
+  }
+  input[type="text"]:focus { border-color: #ffd86b; }
+  button {
+    padding: 14px 28px; border: none; border-radius: 14px;
+    background: linear-gradient(135deg, #ffb6c1, #c9b6ff);
+    color: #2a1a4a; font-size: 16px; font-weight: 600; cursor: pointer;
+    transition: transform .15s, box-shadow .2s; white-space: nowrap;
+  }
+  button:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(201, 182, 255, .4); }
+  button:disabled { opacity: .5; cursor: not-allowed; }
+
+  .story-card {
+    background: rgba(255, 255, 255, .05);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, .1);
+    border-radius: 20px; padding: 32px; min-height: 300px;
+    position: relative;
+  }
+  .story-title {
+    font-size: 18px; color: #ffd86b; margin-bottom: 18px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .audio-box {
+    margin-bottom: 20px; padding: 16px;
+    background: rgba(255, 216, 107, .08);
+    border: 1px solid rgba(255, 216, 107, .25);
+    border-radius: 14px;
+    display: flex; align-items: center; gap: 14px;
+  }
+  .audio-box .play-icon {
+    width: 44px; height: 44px; border-radius: 50%; flex-shrink: 0;
+    background: linear-gradient(135deg, #ffd86b, #ffb6c1);
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer; transition: transform .2s;
+  }
+  .audio-box .play-icon:hover { transform: scale(1.08); }
+  .audio-box .play-icon svg { width: 18px; height: 18px; fill: #2a1a4a; margin-left: 2px; }
+  .audio-box .audio-info { flex: 1; min-width: 0; }
+  .audio-box .audio-info .label { font-size: 13px; color: #ffd86b; }
+  .audio-box .audio-info .meta { font-size: 12px; color: #b8b0d8; margin-top: 2px; }
+  .audio-box audio { display: none; }
+
+  .story-content {
+    font-size: 17px; line-height: 2; color: #f0ebff;
+    white-space: pre-wrap; word-break: break-word;
+  }
+  .story-content .cursor {
+    display: inline-block; width: 2px; height: 1.1em;
+    background: #ffd86b; margin-left: 2px; vertical-align: text-bottom;
+    animation: blink 1s infinite;
+  }
+  @keyframes blink { 50% { opacity: 0; } }
+
+  .empty-hint {
+    color: #8a82b0; text-align: center; padding: 60px 0; font-size: 15px;
+  }
+
+  /* Loading 加载动画 */
+  .loading {
+    display: flex; flex-direction: column; align-items: center; gap: 16px;
+    padding: 70px 0; color: #b8b0d8; font-size: 15px; letter-spacing: 1px;
+  }
+  .loading .spinner {
+    width: 46px; height: 46px; border-radius: 50%;
+    border: 3px solid rgba(255, 255, 255, .12);
+    border-top-color: #ffd86b; border-right-color: #c9b6ff;
+    animation: spin 0.9s linear infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .loading .loading-dots span {
+    display: inline-block; animation: bounceDot 1.2s infinite;
+  }
+  .loading .loading-dots span:nth-child(2) { animation-delay: .15s; }
+  .loading .loading-dots span:nth-child(3) { animation-delay: .3s; }
+  @keyframes bounceDot {
+    0%, 60%, 100% { transform: translateY(0); opacity: .4; }
+    30% { transform: translateY(-6px); opacity: 1; }
+  }
+
+  .status {
+    position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%);
+    background: rgba(0,0,0,.5); padding: 10px 20px; border-radius: 20px;
+    font-size: 13px; color: #d4cdf0; z-index: 10; opacity: 0; transition: opacity .3s;
+  }
+  .status.show { opacity: 1; }
+
+  .error { color: #ff8fa3; }
+
+  @media (max-width: 600px) {
+    .moon { width: 60px; height: 60px; top: 30px; right: 30px; }
+    .container { padding: 40px 16px 60px; }
+    h1 { font-size: 26px; }
+    .input-row { flex-direction: column; }
+    button { width: 100%; }
+  }
+</style>
+</head>
+<body>
+  <div class="stars"></div>
+  <div class="stars2"></div>
+  <div class="stars3"></div>
+  <div class="moon"></div>
+
+  <div class="container">
+    <h1>🌙 月亮睡前故事</h1>
+    <p class="subtitle">输入一个主题，让故事缓缓流淌进梦乡</p>
+
+    <div class="input-card">
+      <label class="input-label">想听关于什么的故事？</label>
+      <div class="input-row">
+        <input type="text" id="storyInput" placeholder="例如：浪来了、小兔子、恐龙世界…" value="浪来了" />
+        <button id="runBtn">开始讲故事</button>
+      </div>
+    </div>
+
+    <div class="story-card">
+      <div class="story-title" id="storyTitle" style="display:none;">✨ 故事开始了</div>
+      <div id="audioBox"></div>
+      <div class="story-content" id="storyContent">
+        <div class="empty-hint">输入主题，点击「开始讲故事」，故事就会像星星一样一颗颗亮起来 ✨</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="status" id="status"></div>
+
+<script>
+  const input = document.getElementById('storyInput');
+  const runBtn = document.getElementById('runBtn');
+  const content = document.getElementById('storyContent');
+  const title = document.getElementById('storyTitle');
+  const audioBox = document.getElementById('audioBox');
+  const statusEl = document.getElementById('status');
+
+  let abortController = null;
+  let isRunning = false;
+  let typeTimer = null;
+  let loadingShown = false;
+
+  function showLoading() {
+    loadingShown = true;
+    content.innerHTML = `
+      <div class="loading">
+        <div class="spinner"></div>
+        <div>正在编织故事<span class="loading-dots"><span> ·</span><span> ·</span><span> ·</span></span></div>
+      </div>
+    `;
+  }
+
+  function hideLoading() {
+    loadingShown = false;
+    const el = content.querySelector('.loading');
+    if (el) el.remove();
+  }
+
+  function showStatus(msg, isError) {
+    statusEl.textContent = msg;
+    statusEl.classList.toggle('error', !!isError);
+    statusEl.classList.add('show');
+    clearTimeout(showStatus._t);
+    showStatus._t = setTimeout(() => statusEl.classList.remove('show'), 3000);
+  }
+
+  function stopTyping() {
+    if (typeTimer) { clearInterval(typeTimer); typeTimer = null; }
+  }
+
+  // 打字机效果：逐字展示文本
+  function typeText(fullText) {
+    stopTyping();
+    content.textContent = '';
+    addCursor();
+    let i = 0;
+    typeTimer = setInterval(() => {
+      if (i >= fullText.length) {
+        stopTyping();
+        removeCursor();
+        return;
+      }
+      content.textContent = fullText.slice(0, i);
+      addCursor();
+      i += 1;
+    }, 28);
+  }
+
+  function addCursor() {
+    let cursor = content.querySelector('.cursor');
+    if (!cursor) {
+      cursor = document.createElement('span');
+      cursor.className = 'cursor';
+      content.appendChild(cursor);
+    }
+  }
+
+  function removeCursor() {
+    const cursor = content.querySelector('.cursor');
+    if (cursor) cursor.remove();
+  }
+
+  function showAudio(link, duration) {
+    const min = Math.floor(duration / 60);
+    const sec = duration % 60;
+    audioBox.innerHTML = `
+      <div class="audio-box">
+        <div class="play-icon" id="playBtn">
+          <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+        </div>
+        <div class="audio-info">
+          <div class="label">🎙️ 故事语音朗读</div>
+          <div class="meta">时长 ${min}:${String(sec).padStart(2, '0')} · 点击播放</div>
+        </div>
+        <audio id="storyAudio" src="${link}" preload="none"></audio>
+      </div>
+    `;
+    const audio = document.getElementById('storyAudio');
+    const playBtn = document.getElementById('playBtn');
+    playBtn.addEventListener('click', () => {
+      if (audio.paused) audio.play();
+      else audio.pause();
+    });
+    audio.addEventListener('play', () => {
+      playBtn.innerHTML = '<svg viewBox="0 0 24 24"><path d="M6 5h4v14H6zM14 5h4v14h-4z"/></svg>';
+    });
+    audio.addEventListener('pause', () => {
+      playBtn.innerHTML = '<svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>';
+    });
+  }
+
+  // 尝试把 content 解析为嵌套 JSON（工作流可能返回 {audio, text} 结构）
+  function parseContent(raw) {
+    try {
+      const obj = JSON.parse(raw);
+      if (obj && (typeof obj.text === 'string' || obj.audio)) {
+        return obj;
+      }
+    } catch (e) { /* 不是 JSON，当纯文本处理 */ }
+    return { text: raw };
+  }
+
+  async function runStory() {
+    const text = input.value.trim();
+    if (!text) { showStatus('请先输入故事主题～', true); return; }
+    if (isRunning) {
+      abortController && abortController.abort();
+      stopTyping();
+      return;
+    }
+
+    isRunning = true;
+    runBtn.textContent = '停止';
+    content.innerHTML = '';
+    audioBox.innerHTML = '';
+    title.style.display = 'flex';
+    showStatus('正在编织故事…');
+    showLoading();
+
+    abortController = new AbortController();
+
+    try {
+      const resp = await fetch('/api/run', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ input: text }),
+        signal: abortController.signal,
+      });
+
+      if (!resp.ok) throw new Error('请求失败：' + resp.status);
+
+      const reader = resp.body.getReader();
+      const decoder = new TextDecoder('utf-8');
+      let buffer = '';
+
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        buffer += decoder.decode(value, { stream: true });
+
+        const events = buffer.split('\n\n');
+        buffer = events.pop();
+
+        for (const raw of events) {
+          const lines = raw.split('\n');
+          let eventType = 'Message';
+          let dataStr = '';
+          for (const line of lines) {
+            if (line.startsWith('event:')) eventType = line.slice(6).trim();
+            else if (line.startsWith('data:')) dataStr += line.slice(5).trim();
+          }
+          if (!dataStr) continue;
+
+          if (eventType === 'Message') {
+            try {
+              const data = JSON.parse(dataStr);
+              if (!data.content) continue;
+              hideLoading();
+              const parsed = parseContent(data.content);
+              if (parsed.text) {
+                showStatus('故事正在流淌…');
+                typeText(parsed.text);
+              }
+              if (parsed.audio && parsed.audio.link) {
+                showAudio(parsed.audio.link, parsed.audio.duration || 0);
+              }
+            } catch (e) { /* 忽略解析失败 */ }
+          } else if (eventType === 'Error') {
+            try {
+              hideLoading();
+              const data = JSON.parse(dataStr);
+              const msg = data.error_message || '工作流执行出错';
+              content.innerHTML = `<div class="error">${msg}</div>`;
+              showStatus(msg, true);
+            } catch (e) { throw e; }
+          } else if (eventType === 'Done') {
+            showStatus('故事讲完啦，晚安 🌙');
+          }
+        }
+      }
+    } catch (err) {
+      if (err.name === 'AbortError') {
+        hideLoading();
+        content.innerHTML = '<div class="empty-hint">已停止，换个主题再来一次吧 🌙</div>';
+        showStatus('已停止');
+      } else {
+        const hint = err.message === 'Failed to fetch'
+          ? '无法连接服务器，请确认已执行 node server.js 并通过 http://localhost:3000 访问'
+          : err.message;
+        content.innerHTML = `<div class="error">${hint}</div>`;
+        showStatus(hint.slice(0, 40), true);
+      }
+    } finally {
+      isRunning = false;
+      runBtn.textContent = '开始讲故事';
+    }
+  }
+
+  runBtn.addEventListener('click', runStory);
+  input.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') runStory();
+  });
+</script>
+</body>
+</html>

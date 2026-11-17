@@ -1,0 +1,8 @@
+{
+  "name": "coze-myth-app",
+  "version": "1.0.0",
+  "description": "Coze 工作流接入示例：神话故事生成器",
+  "scripts": {
+    "start": "node server.js"
+  }
+}

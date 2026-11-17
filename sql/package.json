@@ -1,0 +1,16 @@
+{
+  "name": "sql",
+  "version": "1.0.0",
+  "description": "1. 产品需求整理 2. UI设计  3. 程序开发 4. 测试 5. 部署",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "dependencies": {
+    "mysql2": "^3.24.6"
+  }
+}

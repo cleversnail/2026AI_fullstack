@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>神话故事生成器</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: "PingFang SC", "Microsoft YaHei", sans-serif;
+      min-height: 100vh;
+      background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+      display: flex;
+      justify-content: center;
+      padding: 40px 16px;
+      color: #eee;
+    }
+    .container { width: 100%; max-width: 720px; }
+    h1 {
+      text-align: center;
+      font-size: 28px;
+      margin-bottom: 8px;
+      background: linear-gradient(90deg, #e94560, #ffd460);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+    .subtitle { text-align: center; color: #8892b0; margin-bottom: 32px; font-size: 14px; }
+    .input-row { display: flex; gap: 12px; margin-bottom: 24px; }
+    input {
+      flex: 1;
+      padding: 14px 18px;
+      border-radius: 12px;
+      border: 1px solid #2d3a5c;
+      background: rgba(255, 255, 255, 0.06);
+      color: #eee;
+      font-size: 16px;
+      outline: none;
+      transition: border-color .2s;
+    }
+    input:focus { border-color: #e94560; }
+    input::placeholder { color: #5c6b8a; }
+    button {
+      padding: 14px 28px;
+      border: none;
+      border-radius: 12px;
+      background: linear-gradient(90deg, #e94560, #c73650);
+      color: #fff;
+      font-size: 16px;
+      cursor: pointer;
+      transition: opacity .2s, transform .1s;
+      white-space: nowrap;
+    }
+    button:hover:not(:disabled) { opacity: .9; }
+    button:active:not(:disabled) { transform: scale(.97); }
+    button:disabled { opacity: .4; cursor: not-allowed; }
+    .result-card {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid #2d3a5c;
+      border-radius: 16px;
+      padding: 28px;
+      min-height: 120px;
+      line-height: 1.9;
+      font-size: 16px;
+      display: none;
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+    .result-card.show { display: block; }
+    .status { text-align: center; color: #8892b0; margin-top: 12px; font-size: 14px; display: none; }
+    .status.show { display: block; }
+    .cursor { display: inline-block; width: 2px; height: 1em; background: #ffd460; vertical-align: text-bottom; animation: blink .8s infinite; }
+    @keyframes blink { 50% { opacity: 0; } }
+    .examples { margin-top: 20px; display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; }
+    .examples span { color: #5c6b8a; font-size: 13px; align-self: center; }
+    .examples button {
+      padding: 6px 14px; font-size: 13px; border-radius: 20px;
+      background: rgba(255,255,255,.08); border: 1px solid #2d3a5c;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🏮 神话故事生成器</h1>
+    <p class="subtitle">输入一个标题，AI 用小朋友听得懂的语言讲一个 500 字以内的神话故事</p>
+
+    <div class="input-row">
+      <input id="titleInput" type="text" placeholder="例如：大闹天宫" autofocus />
+      <button id="runBtn" onclick="runWorkflow()">生成故事</button>
+    </div>
+
+    <div class="examples">
+      <span>试试：</span>
+      <button onclick="fillTitle('大闹天宫')">大闹天宫</button>
+      <button onclick="fillTitle('精卫填海')">精卫填海</button>
+      <button onclick="fillTitle('嫦娥奔月')">嫦娥奔月</button>
+    </div>
+
+    <div class="status" id="status"></div>
+    <div class="result-card" id="result"></div>
+  </div>
+
+  <script>
+    const input = document.getElementById('titleInput');
+    const btn = document.getElementById('runBtn');
+    const resultEl = document.getElementById('result');
+    const statusEl = document.getElementById('status');
+    const cursor = '<span class="cursor"></span>';
+
+    input.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') runWorkflow();
+    });
+
+    function fillTitle(t) {
+      input.value = t;
+      runWorkflow();
+    }
+
+    function setStatus(text, showCursor) {
+      statusEl.classList.add('show');
+      statusEl.innerHTML = showCursor ? text + cursor : text;
+    }
+
+    async function runWorkflow() {
+      const title = input.value.trim();
+      if (!title) { input.focus(); return; }
+
+      btn.disabled = true;
+      resultEl.classList.remove('show');
+      resultEl.innerHTML = '';
+      setStatus('正在调用工作流…', true);
+
+      try {
+        const response = await fetch('/api/run', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ input: title }),
+        });
+
+        if (!response.ok) {
+          const errText = await response.text();
+          throw new Error('请求失败 (' + response.status + ')：' + errText);
+        }
+
+        // Coze 流式接口返回 SSE 事件流（标准 SSE 使用 \r\n 行尾，必须先规范化再解析）
+        const contentType = response.headers.get('Content-Type') || '';
+        if (!contentType.includes('text/event-stream')) {
+          // 没返回 SSE，说明是直接报错了（如 Token 失效），抛出错误内容
+          throw new Error(await response.text());
+        }
+
+        const reader = response.body.getReader();
+        const decoder = new TextDecoder();
+        let buffer = '';
+        let storyText = '';
+        let audioUrl = '';
+
+        resultEl.classList.add('show');
+        setStatus('生成中…', true);
+
+        const render = () => {
+          // 故事文本里可能带有 ** 标记（TTS 强调符号），展示时去掉
+          let html = escapeHtml(storyText).replace(/\*\*/g, '').replace(/\n/g, '<br>');
+          if (audioUrl) {
+            html += '<br><br>🎧 语音故事：<audio controls style="width:100%" src="' + escapeHtml(audioUrl) + '"></audio>';
+          }
+          resultEl.innerHTML = html + cursor;
+        };
+
+        while (true) {
+          const { done, value } = await reader.read();
+          if (done) break;
+          buffer += decoder.decode(value, { stream: true });
+          buffer = buffer.replace(/\r\n/g, '\n'); // 兼容 \r\n 行尾
+
+          const events = buffer.split('\n\n');
+          buffer = events.pop(); // 最后一段可能不完整，留到下一轮
+
+          for (const block of events) {
+            // 注意：事件类型在单独的 event: 行中，data: 里的 JSON 并不包含 event 字段
+            let evtType = '';
+            let payload = '';
+            for (const line of block.split('\n')) {
+              if (line.startsWith('event:')) evtType = line.slice(6).trim();
+              else if (line.startsWith('data:')) payload = line.slice(5).trim();
+            }
+            if (!payload) continue;
+            let evt;
+            try {
+              evt = JSON.parse(payload);
+            } catch (e) {
+              continue; // 忽略无法解析的行
+            }
+            // 错误信息（如 4100 Token 失效）也可能直接出现在 data 中
+            if (evt.code !== undefined && evt.code !== 0) {
+              throw new Error('Coze 接口错误 ' + evt.code + '：' + (evt.msg || JSON.stringify(evt)));
+            }
+            if (evtType === 'Error' || evt.event === 'Error') {
+              throw new Error('工作流执行出错：' + JSON.stringify(evt.error || evt));
+            }
+            if ((evtType === 'Message' || evt.event === 'Message') && evt.content) {
+              // content 是工作流输出的 JSON 字符串，如 {"output": "..."} 或 {"text":"...","audio":{"link":"..."}}
+              try {
+                const inner = JSON.parse(evt.content);
+                if (inner && typeof inner === 'object') {
+                  const t = inner.text || inner.output || inner.result;
+                  if (t) storyText = t; // 后到的 End 消息包含完整文本
+                  if (inner.audio && inner.audio.link) audioUrl = inner.audio.link;
+                } else {
+                  storyText += evt.content;
+                }
+              } catch (_) {
+                storyText += evt.content;
+              }
+              render();
+            }
+          }
+        }
+
+        if (!storyText) throw new Error('工作流没有返回内容，请检查 Token 是否有效、工作流输出格式是否正确');
+
+        // 最终渲染（去掉打字光标和 ** 标记）
+        let finalHtml = escapeHtml(storyText).replace(/\*\*/g, '').replace(/\n/g, '<br>');
+        if (audioUrl) {
+          finalHtml += '<br><br>🎧 语音故事：<audio controls style="width:100%" src="' + escapeHtml(audioUrl) + '"></audio>';
+        }
+        resultEl.innerHTML = finalHtml;
+        setStatus('✅ 完成', false);
+      } catch (err) {
+        console.error(err);
+        resultEl.classList.add('show');
+        resultEl.innerHTML = '❌ ' + escapeHtml(err.message || String(err));
+        setStatus('', false);
+      } finally {
+        btn.disabled = false;
+      }
+    }
+
+    function escapeHtml(s) {
+      return s.replace(/[&<>"']/g, (c) => ({
+        '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;',
+      }[c]));
+    }
+  </script>
+</body>
+</html>
