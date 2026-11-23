@@ -10,8 +10,11 @@ translateBtn.addEventListener('click', function () {
   document.getElementById('output').textContent = '翻译中...';
 
   // 将 inputText 传给ollama里面的 deepseek-r1（如何用代码链接ollama）
-  // 在js中发送http请求给 http://localhost:11434/api/chat
-  fetch('http://localhost:11434/api/chat', {
+  // 本机访问直连 11434；经公网隧道访问时走同源 /ollama 代理，避免跨域
+  const apiBase = /^(localhost|127\.0\.0\.1)$/.test(location.hostname)
+    ? 'http://localhost:11434'
+    : '/ollama';
+  fetch(apiBase + '/api/chat', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json'

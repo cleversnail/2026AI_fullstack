@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+</head>
+<body>
+  <button id="btn">提交</button>
+
+  <script>
+    document.getElementById('btn').addEventListener('click', function() {
+      // document.getElementById('btn').innerText = '已提交'
+      this.innerText = '已提交'
+      console.log(this);
+      
+    })
+  </script>
+</body>
+</html>
